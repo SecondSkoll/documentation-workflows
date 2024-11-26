@@ -70,7 +70,8 @@ jobs:
   docchecks:
     name: Run documentation checks
     strategy:
-      matrix: ${{ fromJson(inputs.runs-on) }}
+      matrix:
+        os: ${{ fromJson(inputs.runs-on) }}
     runs-on: ${{ matrix.os }}
     outputs:
       result_spelling: ${{ steps.spellcheck-step.outcome }}
