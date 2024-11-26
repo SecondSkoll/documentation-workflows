@@ -122,7 +122,7 @@ jobs:
           linkcheck-target: ${{ inputs.linkcheck-target }}
           makefile: ${{ inputs.makefile }}
 
-docchecks-self-hosted:
+  docchecks-self-hosted:
     name: Run documentation checks on Canonical infra
     if: ${{ inputs.self-host == true || inputs.self-host == 'true' }}
     runs-on: '[self-hosted, Linux, amd64, noble]'
