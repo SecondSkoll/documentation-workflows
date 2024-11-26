@@ -55,7 +55,7 @@ on:
       self-hosted:
         description: 'If true run on Canonical infrastructure'
         required: false
-        tyoe: bool
+        type: bool
         default: 'false'
     outputs:
       spellcheck-result:
