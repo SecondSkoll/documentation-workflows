@@ -69,7 +69,10 @@ on:
 jobs:
   docchecks:
     name: Run documentation checks
-    runs-on: ${{ fromJson(inputs.runs-on) }}
+    strategy:
+      matrix:
+        runner: ${{ fromJson(inputs.runs-on) }}
+    runs-on: ${{ matrix.runner }}
     outputs:
       result_spelling: ${{ steps.spellcheck-step.outcome }}
       result_woke: ${{ steps.woke-step.outcome }}
