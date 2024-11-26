@@ -52,11 +52,6 @@ on:
         required: false
         type: string
         default: 'pa11y'
-      self-hosted:
-        description: 'If true run on Canonical infrastructure'
-        required: false
-        type: string
-        default: 'false'
     outputs:
       spellcheck-result:
         description: "Result of the spelling check"
@@ -74,8 +69,7 @@ on:
 jobs:
   docchecks:
     name: Run documentation checks
-    if: ${{ inputs.self-host == false || inputs.self-host == 'false' }}
-    runs-on: '["ubuntu-22.04"]'
+    runs-on: ["${{ fromJson(inputs.runs-on) }}"]
     outputs:
       result_spelling: ${{ steps.spellcheck-step.outcome }}
       result_woke: ${{ steps.woke-step.outcome }}
@@ -121,63 +115,3 @@ jobs:
           install-target: ${{ inputs.install-target }}
           linkcheck-target: ${{ inputs.linkcheck-target }}
           makefile: ${{ inputs.makefile }}
-
-  docchecks-self-hosted:
-    name: Run documentation checks on Canonical infra
-    if: ${{ inputs.self-host == true || inputs.self-host == 'true' }}
-    runs-on: '[self-hosted, Linux, amd64, noble]'
-    outputs:
-      result_spelling: ${{ steps.spellcheck-step.outcome }}
-      result_woke: ${{ steps.woke-step.outcome }}
-      result_links: ${{ steps.linkcheck-step.outcome }}
-      # result_pa11y: ${{ steps.pa11y-step.outcome }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ inputs.fetch-depth }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ inputs.python-version }}
-
-      - name: Spell Check
-        id: spellcheck-step
-        if: success() || failure()
-        uses: canonical/documentation-workflows/spellcheck@main
-        with:
-          working-directory: ${{ inputs.working-directory }}
-          install-target: ${{ inputs.install-target }}
-          spelling-target: ${{ inputs.spelling-target }}
-          makefile: ${{ inputs.makefile }}
-
-      - name: Inclusive Language Check
-        id: woke-step
-        if: success() || failure()
-        uses: canonical/documentation-workflows/inclusive-language@main
-        with:
-          working-directory: ${{ inputs.working-directory }}
-          install-target: ${{ inputs.install-target }}
-          woke-target: ${{ inputs.woke-target }}
-          makefile: ${{ inputs.makefile }}
-
-      - name: Link Check
-        id: linkcheck-step
-        if: success() || failure()
-        uses: canonical/documentation-workflows/linkcheck@main
-        with:
-          working-directory: ${{ inputs.working-directory }}
-          install-target: ${{ inputs.install-target }}
-          linkcheck-target: ${{ inputs.linkcheck-target }}
-          makefile: ${{ inputs.makefile }}
-      # - name: Accessibility Check
-      #   id: pa11y-step
-      #   continue-on-error: true
-      #   if: success() || failure()
-      #   uses: canonical/documentation-workflows/pa11y@main
-      #   with:
-      #     working-directory: ${{ inputs.working-directory }}
-      #     install-target: ${{ inputs.install-target }}
-      #     pa11y-target: ${{ inputs.pa11y-target }}
-      #     makefile: ${{ inputs.makefile }}
